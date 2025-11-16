@@ -1,0 +1,19 @@
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 虚拟环境
+venv/
+
+# 日志与数据文件
+logs/
+data/
+
+# 编译与打包产物
+build/
+dist/
+*.spec
+
+# IDE配置
+.vscode/
+.idea/

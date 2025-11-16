@@ -1,0 +1,7 @@
+{
+    "serial_port": "COM3",
+    "baud_rate": 9600,
+    "trigger_temp": 50,
+    "trigger_count": 2,
+    "massspec_path": "C:/Program Files/MassSpec/massspec.exe"
+}

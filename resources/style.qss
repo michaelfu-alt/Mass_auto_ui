@@ -1,0 +1,13 @@
+/* UI 样式表 */
+QMainWindow {
+    background-color: #f8f9fa;
+}
+QPushButton {
+    background-color: #ff8800;
+    color: white;
+    border-radius: 6px;
+    padding: 5px;
+}
+QPushButton:hover {
+    background-color: #ff9900;
+}

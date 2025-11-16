@@ -1,0 +1,6 @@
+{
+  "port": "/dev/cu.usbserial-1130",
+  "temp_threshold": "2",
+  "trigger_times": "10",
+  "mass_path": "/Applications/MassSpecApp.app"
+}
