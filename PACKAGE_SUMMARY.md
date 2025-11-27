@@ -2,10 +2,11 @@
 
 ## ✅ 打包状态
 
-**状态**: ✅ 成功  
+**状态**: ✅ 成功（已优化）  
 **日期**: 2025-11-27  
 **PyInstaller 版本**: 6.17.0  
-**Python 版本**: 3.14.0
+**Python 版本**: 3.14.0  
+**版本**: 2.0 精简版
 
 ## 📦 打包结果
 
@@ -13,26 +14,32 @@
 
 - **输出目录**: `dist\Mass_Auto_UI\`
 - **可执行文件**: `Mass_Auto_UI.exe`
-- **总大小**: 约 655 MB
-- **文件数量**: 3700+ 个文件
+- **总大小**: 约 **116 MB** ⚡ (优化前: 655 MB)
+- **文件数量**: **96 个文件** (优化前: 3700+)
+- **体积减少**: **82.3%** (减少 539 MB)
 
 ### 文件结构
 
 ```
-dist\Mass_Auto_UI\
+dist\Mass_Auto_UI\            # 总计 116 MB (优化后)
 ├── Mass_Auto_UI.exe          # 主程序 (约 1.5 MB)
 └── _internal\                # 内部依赖文件
-    ├── config\               # 配置文件目录 ✓
+    ├── config\               # 配置文件目录 ✓ (~20 KB)
     │   ├── app_config.json
     │   ├── config.json
     │   ├── ui_settings.json
     │   └── 测试配置*.json
-    ├── resources\            # 资源文件目录 ✓
+    ├── resources\            # 资源文件目录 ✓ (~5 KB)
     │   └── style.qss
-    ├── PySide6\              # Qt 框架 (约 520 MB)
-    ├── pywinauto\            # Windows 自动化库
-    ├── win32\                # Windows API
-    └── [其他依赖库...]
+    ├── PySide6\              # Qt 核心框架 (~65 MB, 已精简)
+    │   ├── Qt6Core.dll
+    │   ├── Qt6Gui.dll
+    │   ├── Qt6Widgets.dll
+    │   └── plugins\          # 最小插件集
+    ├── pywin32_system32\     # Windows COM (~15 MB)
+    ├── win32\                # Windows API (~8 MB)
+    ├── shiboken6\            # Qt 绑定 (~3 MB)
+    └── [其他依赖库...]       # (~22 MB)
 ```
 
 ## 🔧 技术细节
