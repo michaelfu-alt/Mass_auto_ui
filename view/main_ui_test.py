@@ -505,11 +505,11 @@ class TempMonitorUI(QMainWindow):
         recipe_prepare_frame.setStyleSheet("QFrame { background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 5px; padding: 10px; }")
         recipe_prepare_layout = QVBoxLayout(recipe_prepare_frame)
         
-        prepare_title = QLabel("⚠️ 准备工作：请先打开Recipe软件")
+        prepare_title = QLabel("⚠️ 准备工作：请先打开PV MassSpec软件")
         prepare_title.setStyleSheet("font-size: 14px; font-weight: bold; color: #856404;")
         recipe_prepare_layout.addWidget(prepare_title)
         
-        prepare_hint = QLabel("请打开Recipe软件，确保'Recipe: Setup Summary'窗口可见，然后点击下方按钮确认")
+        prepare_hint = QLabel("打开PV MassSpec软件后，点击Start/Monitor/Review and Start, 确保'Recipe: Setup Summary'窗口可见，然后点击下方按钮确认")
         prepare_hint.setWordWrap(True)
         prepare_hint.setStyleSheet("color: #856404;")
         recipe_prepare_layout.addWidget(prepare_hint)
