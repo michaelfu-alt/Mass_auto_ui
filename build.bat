@@ -18,12 +18,24 @@ if not exist "venv\Scripts\python.exe" (
 REM 激活虚拟环境
 call venv\Scripts\activate.bat
 
+REM 检查图标文件
+echo 🎨 检查应用图标...
+if not exist "resources\icon.ico" (
+    echo ⚠️  图标文件不存在，正在生成...
+    python generate_icon.py
+    if errorlevel 1 (
+        echo ❌ 图标生成失败！请确保已安装 Pillow: pip install Pillow -i https://pypi.tuna.tsinghua.edu.cn/simple
+        pause
+        exit /b 1
+    )
+)
+
 REM 检查 PyInstaller
 echo 📦 检查 PyInstaller...
 python -c "import PyInstaller" 2>nul
 if errorlevel 1 (
-    echo 📥 安装 PyInstaller...
-    pip install pyinstaller
+    echo 📥 安装 PyInstaller（使用清华镜像）...
+    pip install pyinstaller -i https://pypi.tuna.tsinghua.edu.cn/simple
 )
 
 REM 清理旧的构建文件

@@ -21,13 +21,25 @@ if (-not (Test-Path "venv\Scripts\python.exe")) {
 Write-Host "🔧 激活虚拟环境..." -ForegroundColor Yellow
 & "venv\Scripts\Activate.ps1"
 
+# 检查图标文件
+Write-Host "🎨 检查应用图标..." -ForegroundColor Yellow
+if (-not (Test-Path "resources\icon.ico")) {
+    Write-Host "⚠️  图标文件不存在，正在生成..." -ForegroundColor Yellow
+    & python generate_icon.py
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ 图标生成失败！请确保已安装 Pillow: pip install Pillow -i https://pypi.tuna.tsinghua.edu.cn/simple" -ForegroundColor Red
+        Read-Host "按回车键退出"
+        exit 1
+    }
+}
+
 # 检查 PyInstaller
 Write-Host "📦 检查 PyInstaller..." -ForegroundColor Yellow
 try {
     & python -c "import PyInstaller" 2>$null
 } catch {
-    Write-Host "📥 安装 PyInstaller..." -ForegroundColor Yellow
-    & pip install pyinstaller
+    Write-Host "📥 安装 PyInstaller（使用清华镜像）..." -ForegroundColor Yellow
+    & pip install pyinstaller -i https://pypi.tuna.tsinghua.edu.cn/simple
 }
 
 # 清理旧的构建文件

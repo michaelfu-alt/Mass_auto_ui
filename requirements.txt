@@ -6,3 +6,4 @@ pygetwindow>=0.0.9
 psutil>=5.9.0
 pywinauto
 pywin32
+Pillow>=9.0.0

@@ -7,8 +7,101 @@
 ## 🔧 前置要求
 
 1. **Python 环境**：Python 3.8+ （建议 3.10+）
-2. **虚拟环境**：已创建并安装所有依赖
-3. **PyInstaller**：打包工具（构建脚本会自动安装）
+2. **Git**：用于克隆仓库
+3. **虚拟环境**：需要从 git clone 后创建（见下方完整流程）
+4. **PyInstaller**：打包工具（构建脚本会自动安装）
+
+## 📥 从 Git Clone 到本地后的完整设置流程
+
+### 方法 1：使用自动设置脚本（推荐）
+
+**Windows 命令提示符 (CMD):**
+
+```cmd
+git clone <repository_url>
+cd Mass_auto_ui
+setup_env.bat
+```
+
+**PowerShell:**
+
+```powershell
+git clone <repository_url>
+cd Mass_auto_ui
+.\setup_env.ps1
+```
+
+**注意：** 如果 PowerShell 执行策略限制，可能需要先运行：
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+设置脚本会自动完成：
+- ✅ 创建虚拟环境
+- ✅ 使用清华镜像升级 pip
+- ✅ 使用清华镜像安装所有依赖
+
+### 方法 2：手动设置
+
+#### 步骤 1：克隆仓库
+
+```bash
+git clone <repository_url>
+cd Mass_auto_ui
+```
+
+#### 步骤 2：创建虚拟环境
+
+```cmd
+# Windows 命令提示符
+python -m venv venv
+```
+
+或使用 PowerShell：
+
+```powershell
+# PowerShell
+python -m venv venv
+```
+
+#### 步骤 3：激活虚拟环境并使用清华镜像安装依赖
+
+**Windows 命令提示符 (CMD):**
+
+```cmd
+# 激活虚拟环境
+venv\Scripts\activate
+
+# 使用清华镜像升级 pip
+python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 使用清华镜像安装依赖
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+**PowerShell:**
+
+```powershell
+# 激活虚拟环境
+.\venv\Scripts\Activate.ps1
+
+# 使用清华镜像升级 pip
+python -m pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 使用清华镜像安装依赖
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+### 步骤 4：生成应用图标
+
+在打包前，需要先生成应用图标：
+
+```cmd
+# 激活虚拟环境后
+python generate_icon.py
+```
+
+这将生成 `resources/icon.ico` 文件（橘红色背景，白色 "Auto PV Mass" 文字）。
 
 ## 📦 打包文件说明
 
@@ -23,9 +116,11 @@
 `Mass_auto_ui.spec` 文件包含以下配置：
 
 - **入口文件**：`view\main_ui_test.py`
+- **打包模式**：`onedir`（目录模式，确保 `exclude_binaries=True` 和 `COLLECT` 存在）
+- **应用图标**：`resources/icon.ico`（橘红色背景，白色 "Auto PV Mass" 文字）
 - **包含的数据**：
   - `config/` - 配置文件目录
-  - `resources/` - 资源文件目录
+  - `resources/` - 资源文件目录（包含图标）
 - **隐藏导入**：
   - PySide6 相关模块
   - pywinauto 和 Windows 自动化模块
@@ -35,11 +130,17 @@
 
 ## 🚀 打包步骤
 
+**重要提示：** 打包前请确保已完成上述"从 Git Clone 到本地后的完整设置流程"，包括：
+- ✅ 已创建虚拟环境
+- ✅ 已使用清华镜像安装所有依赖
+- ✅ 已生成应用图标（运行 `python generate_icon.py`）
+
 ### 方法 1：使用批处理脚本（推荐）
 
 1. 打开命令提示符
 2. 导航到项目根目录
-3. 运行打包脚本：
+3. 确保虚拟环境已激活（如果未激活，运行 `venv\Scripts\activate`）
+4. 运行打包脚本：
 
 ```cmd
 build.bat
@@ -61,15 +162,20 @@ build.bat
 # 激活虚拟环境
 venv\Scripts\activate
 
-# 安装 PyInstaller（如果未安装）
-pip install pyinstaller
+# 安装 PyInstaller（如果未安装，使用清华镜像）
+pip install pyinstaller -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 确保图标已生成（如果未生成）
+python generate_icon.py
 
 # 清理旧的构建文件
 rmdir /s /q build dist
 
-# 开始打包
+# 开始打包（onedir 模式）
 pyinstaller Mass_auto_ui.spec --clean
 ```
+
+**注意：** 打包模式已配置为 `onedir`（目录模式），输出在 `dist/Mass_Auto_UI/` 目录中，包含可执行文件和所有依赖文件。
 
 ## 📂 输出结构
 
@@ -187,14 +293,15 @@ exe = EXE(
    - 使用目录模式（当前配置）
    - 启用 UPX 压缩
 
-3. **添加图标**：
-   ```python
-   exe = EXE(
-       ...
-       icon='resources/icon.ico',  # 添加应用图标
-       ...
-   )
-   ```
+3. **应用图标**：
+   - 图标已配置在 `Mass_auto_ui.spec` 中：`icon='resources/icon.ico'`
+   - 使用 `python generate_icon.py` 生成图标
+   - 图标为橘红色背景，白色 "Auto PV Mass" 文字
+
+4. **打包模式**：
+   - 当前配置为 `onedir`（目录模式）
+   - 输出目录：`dist/Mass_Auto_UI/`
+   - 包含可执行文件和所有依赖文件
 
 ## 📞 支持
 
