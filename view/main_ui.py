@@ -403,7 +403,8 @@ class TempMonitorUI(QMainWindow):
                         def reset_trigger():
                             self.trigger_activated = False
                             self._trigger_counter = 0
-                            self._last_temp_above_threshold = False
+                            # 不重置_last_temp_above_threshold，保持当前温度状态
+                            # 这样只有在温度从低于阈值变为高于阈值时才会再次触发
                             self._last_trigger_time = None
                             self._update_log("[INFO] 启动保护解除，可再次检测触发条件。")
                         threading.Timer(10.0, reset_trigger).start()
