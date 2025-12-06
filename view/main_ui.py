@@ -360,61 +360,69 @@ class TempMonitorUI(QMainWindow):
                 # 检查当前温度是否高于阈值
                 current_above = temp_value >= self.temp_threshold
                 
-                # 只有在温度从低于阈值变为高于阈值时才累加计数器
-                if current_above and not self._last_temp_above_threshold:
+                # 只要温度高于阈值，就检查是否可以计数
+                if current_above:
                     current_time = time.time()
                     
-                    # 检查是否在间隔时间内（如果不是第一次触发）
-                    if self._last_trigger_time is not None:
+                    # 判断是否可以计数
+                    should_count = False
+                    if self._last_trigger_time is None:
+                        # 第一次触发，直接计数
+                        should_count = True
+                    else:
+                        # 检查间隔时间
                         time_since_last = current_time - self._last_trigger_time
-                        if time_since_last < self.trigger_interval:
-                            # 间隔时间太短，不计数，等待下次
+                        if time_since_last >= self.trigger_interval:
+                            # 间隔时间满足，可以计数
+                            should_count = True
+                        else:
+                            # 间隔时间不足，不计数
                             debug_msg = f"[DEBUG] 触发间隔不足: {time_since_last:.1f}秒 < {self.trigger_interval}秒，等待中..."
                             try:
                                 print(debug_msg)
                             except UnicodeEncodeError:
                                 print(f"[DEBUG] Interval too short: {time_since_last:.1f}s < {self.trigger_interval}s")
                             self.log_box.append(debug_msg)
-                            # 不更新状态，保持_last_temp_above_threshold为False，这样下次温度数据到来时还能再次检查
-                            return
                     
-                    # 温度从低于阈值变为高于阈值，计数器+1
-                    self._trigger_counter += 1
-                    self._last_trigger_time = current_time
-                    debug_msg = f"[DEBUG] 达到阈值: {self._trigger_counter}/{self.trigger_times} (间隔: {self.trigger_interval}秒)"
-                    try:
-                        print(debug_msg)
-                    except UnicodeEncodeError:
-                        print(f"[DEBUG] Threshold reached: {self._trigger_counter}/{self.trigger_times} (interval: {self.trigger_interval}s)")
-                    self.log_box.append(debug_msg)
-                    
-                    # 检查是否达到触发次数
-                    if self._trigger_counter >= self.trigger_times:
-                        info_msg = "[INFO] 启动条件满足，准备执行自动控制..."
+                    if should_count:
+                        # 计数器+1
+                        self._trigger_counter += 1
+                        self._last_trigger_time = current_time
+                        debug_msg = f"[DEBUG] 达到阈值: {self._trigger_counter}/{self.trigger_times} (间隔: {self.trigger_interval}秒)"
                         try:
-                            print(info_msg)
+                            print(debug_msg)
                         except UnicodeEncodeError:
-                            print("[INFO] Trigger condition met, executing auto control...")
-                        self.log_box.append(info_msg)
-                        self._trigger_auto_control()
-                        self.trigger_activated = True
+                            print(f"[DEBUG] Threshold reached: {self._trigger_counter}/{self.trigger_times} (interval: {self.trigger_interval}s)")
+                        self.log_box.append(debug_msg)
+                        
+                        # 检查是否达到触发次数
+                        if self._trigger_counter >= self.trigger_times:
+                            info_msg = "[INFO] 启动条件满足，准备执行自动控制..."
+                            try:
+                                print(info_msg)
+                            except UnicodeEncodeError:
+                                print("[INFO] Trigger condition met, executing auto control...")
+                            self.log_box.append(info_msg)
+                            self._trigger_auto_control()
+                            self.trigger_activated = True
 
-                        # 启动保护逻辑：10秒后允许重新触发
-                        def reset_trigger():
-                            self.trigger_activated = False
-                            self._trigger_counter = 0
-                            # 不重置_last_temp_above_threshold，保持当前温度状态
-                            # 这样只有在温度从低于阈值变为高于阈值时才会再次触发
-                            self._last_trigger_time = None
-                            self._update_log("[INFO] 启动保护解除，可再次检测触发条件。")
-                        threading.Timer(10.0, reset_trigger).start()
+                            # 启动保护逻辑：10秒后允许重新触发
+                            def reset_trigger():
+                                self.trigger_activated = False
+                                self._trigger_counter = 0
+                                self._last_trigger_time = None
+                                self._update_log("[INFO] 启动保护解除，可再次检测触发条件。")
+                            threading.Timer(10.0, reset_trigger).start()
+                
                 elif not current_above and self._last_temp_above_threshold:
-                    # 温度从高于阈值变为低于阈值，重置计数器
+                    # 温度从高于阈值变为低于阈值，重置计数器（方案1：严格模式）
                     if self._trigger_counter != 0:
+                        debug_msg = "[DEBUG] 温度下降，重置计数器。"
                         try:
-                            print("[DEBUG] 温度下降，重置计数器。")
+                            print(debug_msg)
                         except UnicodeEncodeError:
                             print("[DEBUG] Temperature dropped, resetting counter.")
+                        self.log_box.append(debug_msg)
                     self._trigger_counter = 0
                     self._last_trigger_time = None
                 
